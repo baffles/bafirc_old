@@ -337,7 +337,7 @@ birc_message *birc_parse(char *msg)
   if(!ret)
     return NULL;
   ret->num_params = 0;
-  ret->message = (char *)balloc(strlen(ret->message));
+  ret->message = (char *)balloc(strlen(msg));
   if(!ret->message)
   {
     bfree(ret);

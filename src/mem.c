@@ -77,6 +77,7 @@ void *bcalloc(size_t memsize, size_t size)
 
 void *brealloc(void *ptr, size_t size)
 {
+  printf("ptr is 0x%p -- size is %d\n", ptr, size);
   b__internal_memmap_list *node = b__internal_memmap, *working = NULL;
   if(size == 0)
   {
@@ -86,13 +87,16 @@ void *brealloc(void *ptr, size_t size)
   if(!ptr)
     return balloc(size);
   
-  for(; node->next != NULL; node=node->next)
+  while(1)
   {
     if(node->ptr_address == ptr)
     {
       working = node;
       break;
     }
+    if(!node->next)
+      break;
+    node = node->next;
   }
   
   if(working == NULL) /* this wasn't found in the list, so just do what they want anyway :P */
@@ -168,7 +172,7 @@ void print_mem_report(FILE *out)
     i = b__internal_memmap;
     while(1)
     {
-      fprintf(out, " * Address: %p\tSize: %10d bytes\t\t%s\n", (void *)i, i->size, (i->allocated ? "Is Allocated" : "Isn't Allocated"));
+      fprintf(out, " * Address: 0x%p\tSize: %10d bytes\t\t%s\n", (void *)i, i->size, (i->allocated ? "Is Allocated" : "Isn't Allocated"));
       if(i->next == NULL)
         break;
       i = i->next;
