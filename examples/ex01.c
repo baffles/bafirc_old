@@ -20,7 +20,7 @@ int privmsg_proc(bcallback_info *inf)
       printf("Dying\n");
       bsock_send_fmt(inf->irc->socket, "PRIVMSG #iia :Dying cause %s said !die.\r\n", inf->message->nickname);
       bsock_send_fmt(inf->irc->socket, "QUIT :I'll be back</accent>\r\n");
-      Sleep(1000);
+      //Sleep(1000);
       return -1;
     }
     if(strncasecmp(":!test", inf->message->params[i], 6) == 0 || strncasecmp("!test", inf->message->params[i], 5) == 0)
