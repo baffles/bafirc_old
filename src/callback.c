@@ -197,18 +197,20 @@ int bcallback_handle(birc_message *m, birc *irc)
       node = node->next;
     }
   }
+  return 0;
 }
 
 
 int bcallback_init()
 {
   atexit(bcallback_deinit);
+  return 0;
 }
 
 void bcallback_deinit()
 {
   /* just clean up the global list */
-  bcallback_list *node = bcallback_global_list, *tmp;
+  bcallback_list *node = bcallback_global_list, *tmp = NULL;
   if(node)
   {
     while(1)

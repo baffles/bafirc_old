@@ -19,7 +19,7 @@ birc *birc_connect(char *server, int port, char *nick1, char *nick2, char *nick3
   
   /* get our hostname */
   LOG("Attempting to look up our hostname...");
-  if(gethostname(&our_host, 512) == -1)
+  if(gethostname(our_host, 512) == -1)
   {
     LOG("Couldn't look up our hostname, setting it to localhost");
     sprintf(our_host, "localhost");
@@ -45,7 +45,7 @@ birc *birc_connect(char *server, int port, char *nick1, char *nick2, char *nick3
   if(use_identd)
   {
     LOG("Starting up IdentD.");
-    ret->identd = bidentd_create(username, "UNIX");
+    ret->identd = bidentd_create(username, "UNIX", ret);
     bidentd_start(ret->identd);
   }
   else
@@ -73,6 +73,7 @@ birc *birc_connect(char *server, int port, char *nick1, char *nick2, char *nick3
   ret->server = (char *)balloc((strlen(server) + 1));
   strcpy(ret->server, server);
 
+  ret->nicks = (char **)balloc(sizeof(char **));
   ret->nicks[0] = (char *)balloc(nicklen[0]);
   if(!ret->nicks[0])
   {
@@ -217,7 +218,7 @@ void birc_destroy(birc *i)
 }
 
 
-void *bafirc_irc_thread(void *data)
+void *birc_thread(void *data)
 {
   char buf[1024], tmp[1024], tmp2[1024];
   char *cur;
@@ -228,7 +229,7 @@ void *bafirc_irc_thread(void *data)
     //yield_timeval.sec = 0;
     //yield_timeval.usec = 10;
 #endif
-  bthread *self = (bthrea *)data;
+  bthread *self = (bthread *)data;
   birc *irc = (birc *)self->data;
   birc_message *msg;
   offset = index = index2 = 0;
@@ -284,7 +285,7 @@ void *bafirc_irc_thread(void *data)
       if(strncasecmp(msg->command, "PING", 4) == 0)
       {
         printf("PING!\n");
-        bafirc_sock_send_fmt(irc->socket, "PONG :%s\r\n", msg->params[0]);
+        bsock_send_fmt(irc->socket, "PONG :%s\r\n", msg->params[0]);
       }/*
       if(strncasecmp(msg->command, "ERROR", 5) == 0)
       {
@@ -425,11 +426,11 @@ birc_message *birc_parse(char *msg)
         ++t2;
       strncpy(t3, t1, t2 - t1);
       t3[t2 - t1] = '\0';
-      if(bafirc_internal__add_param(ret, t3) != 0)
+      if(birc__add_param(ret, t3) != 0)
       {
         int j;
         for(j = 0; j < ret->num_params; ++j)
-          bfree(ret->params[j])
+          bfree(ret->params[j]);
         bfree(ret->params);
         bfree(ret->command);
         bfree(ret->hostname);
@@ -447,11 +448,11 @@ birc_message *birc_parse(char *msg)
         ++t2;
       strncpy(t3, t1, t2 - t1);
       t3[t2 - t1] = '\0';
-      if(bafirc_internal__add_param(ret, t3) != 0)
+      if(birc__add_param(ret, t3) != 0)
       {
         int j;
         for(j = 0; j < ret->num_params; ++j)
-          bfree(ret->params[j])
+          bfree(ret->params[j]);
         bfree(ret->params);
         bfree(ret->command);
         bfree(ret->hostname);
@@ -482,20 +483,20 @@ int birc__add_param(birc_message *m, const char *param)
     m->num_params--;
     return -1;
   }
-  strcpy(m->parmas[m->num_params -1], param);
+  strcpy(m->params[m->num_params -1], param);
   return 0;
 }
 
 void birc_destroy_message(birc_message *m)
 {
   int j;
-  for(j = 0; j < ret->num_params; ++j)
-    bfree(ret->params[j])
-  bfree(ret->params);
-  bfree(ret->command);
-  bfree(ret->hostname);
-  bfree(ret->username);
-  bfree(ret->nickname);
-  bfree(ret->message);
-  bfree(ret);
+  for(j = 0; j < m->num_params; ++j)
+    bfree(m->params[j]);
+  bfree(m->params);
+  bfree(m->command);
+  bfree(m->hostname);
+  bfree(m->username);
+  bfree(m->nickname);
+  bfree(m->message);
+  bfree(m);
 }

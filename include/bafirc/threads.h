@@ -28,8 +28,8 @@ typedef struct bthread
 } bthread;
 
 EXPORT bthread *bthread_create(thread_func tfunc, void *data);
-EXPORT void bthread_start(bafirc_thread *t);
-EXPORT void bthread_stop(bafirc_thread *t);
-EXPORT void bthread_destroy(bafirc_thread *t);
+EXPORT void bthread_start(bthread *t);
+EXPORT void bthread_stop(bthread *t);
+EXPORT void bthread_destroy(bthread *t);
 
 #endif /* BAFIRC_THREADS_H */

@@ -28,7 +28,7 @@ typedef struct birc
   birc_server_info *info;
   bthread *thread;
   bidentd *identd;
-  bsock *socket;
+  struct bsock *socket;
   unsigned char use_identd;
   int lag, last_ping;
   char *server;
@@ -54,7 +54,7 @@ EXPORT birc *birc_connect(char *server, int port, char *nick1, char *nick2, char
 EXPORT void birc_disconnect(birc *i, char *reason);
 EXPORT void birc_destroy(birc *i);
 
-EXPORT void *bafirc_irc_thread(void *data);
+EXPORT void *birc_thread(void *data);
 
 EXPORT birc_message *birc_parse(char *msg);
 EXPORT int birc__add_param(birc_message *m, const char *param);

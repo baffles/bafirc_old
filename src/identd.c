@@ -13,10 +13,10 @@
 EXPORT bidentd *bidentd_create(char *id, char *os, birc *irc)
 {
 #ifdef ON_WINDOWS
-  bidentd *ret = (bident *)balloc(sizeof(bidentd));
+  bidentd *ret = (bidentd *)balloc(sizeof(bidentd));
   if(!ret)
     return NULL;
-  ret->thread = bthread_create(bident_thread, ret);
+  ret->thread = bthread_create(bidentd_thread, ret);
   if(!ret->thread)
   {
     bfree(ret);
@@ -44,7 +44,7 @@ EXPORT bidentd *bidentd_create(char *id, char *os, birc *irc)
 #endif /* ON_WINDOWS */
 }
 
-EXPORT void bidentd_destroy(bident *i)
+EXPORT void bidentd_destroy(bidentd *i)
 {
 #ifdef ON_WINDOWS
   if(!i)
@@ -58,7 +58,7 @@ EXPORT void bidentd_destroy(bident *i)
 }
 
 
-EXPORT void bidentd_start(bafirc_identd *i)
+EXPORT void bidentd_start(bidentd *i)
 {
 #ifdef ON_WINDOWS
   bthread_start(i->thread);
@@ -68,7 +68,7 @@ EXPORT void bidentd_start(bafirc_identd *i)
 EXPORT void *bidentd_thread(void *data)
 {
 #ifdef ON_WINDOWS
-  bthread *self = (btread *)data;
+  bthread *self = (bthread *)data;
   bidentd *i = (bidentd *)self->data;
   char response[512];
   int ic, s; // sockets
@@ -106,4 +106,5 @@ EXPORT void *bidentd_thread(void *data)
   close(ic);
   close(s);
 #endif /* ON_WINDOWS */
+  return NULL;
 }

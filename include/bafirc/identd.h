@@ -19,10 +19,10 @@ typedef struct bidentd
 {
   bthread *thread;
   char *id, *os;
-  birc *irc;
+  struct birc *irc;
 } bidentd;
 
-EXPORT bidentd *bidentd_create(char *id, char *os, birc *irc);
+EXPORT bidentd *bidentd_create(char *id, char *os, struct birc *irc);
 EXPORT void bidentd_destroy(bidentd *i);
 
 EXPORT void bidentd_start(bidentd *i);

@@ -17,8 +17,8 @@
 
 typedef struct bcallback_info
 {
-  birc_message *message;
-  birc *irc;
+  struct birc_message *message;
+  struct birc *irc;
 } bcallback_info;
 
 typedef int (*bcallback_func)(bcallback_info *);
@@ -35,10 +35,10 @@ extern bcallback_list *bcallback_global_list;
 EXPORT int bcallback_global_install(bcallback_func func, char *trigger);
 EXPORT int bcallback_global_uninstall(bcallback_func func);
 
-EXPORT int bcallback_install(birc *irc, bcallback_func func, char *trigger);
-EXPORT int bcallback_uninstall(birc *irc, bcallback_func func);
+EXPORT int bcallback_install(struct birc *irc, bcallback_func func, char *trigger);
+EXPORT int bcallback_uninstall(struct birc *irc, bcallback_func func);
 
-EXPORT int bcallback_handle(birc_message *m, birc *irc);
+EXPORT int bcallback_handle(struct birc_message *m, struct birc *irc);
 
 EXPORT int bcallback_init();
 EXPORT void bcallback_deinit();

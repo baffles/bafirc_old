@@ -36,6 +36,8 @@ extern "C" {
   #define LOG(v)
 #endif
 
+#define MAX_HOSTNAME 1024
+#define MAXHOSTNAME 1024
 #define MAX_ERROR_LENGTH 255
 EXPORT char bafirc_error[MAX_ERROR_LENGTH];
 
@@ -124,9 +126,9 @@ EXPORT FILE *bafirc_log_file;
 
 #include "bafirc/socket.h"
 #include "bafirc/identd.h"
-#include "bafirc/irc.h"
 #include "bafirc/callback.h"
-#include "bafirc/rfc.h"
+#include "bafirc/irc.h"
+//#include "bafirc/rfc.h"
 
 EXPORT BOOL bafirc_init();
 EXPORT void bafirc_deinit();

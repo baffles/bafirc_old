@@ -17,7 +17,7 @@ int bsock_send(bsock *s, char *buf, int len)
   data_len = (strlen(buf) > len ? len : strlen(buf));
   while(sent < data_len)
   {
-    ls = send(s->socket, (const char *)data + sent, data_len - sent, 0);
+    ls = send(s->socket, (const char *)buf + sent, data_len - sent, 0);
     if(ls <= 0)
       break;
     sent += ls;
@@ -60,7 +60,7 @@ bsock *bsock_connect(char *host, int port, unsigned char non_blocking)
   
   ret = (bsock *)balloc(sizeof(bsock));
   ret->hostname = (char *)balloc((strlen(host) + 1) * sizeof(char));
-  strcpy(ret->server, host);
+  strcpy(ret->hostname, host);
   ret->port = port;
   ret->socket = 0;
   ret->connected = 0;
@@ -74,15 +74,15 @@ bsock *bsock_connect(char *host, int port, unsigned char non_blocking)
     return ret;
   }
   
-  ret->dest_addr.sin_family = AF_INET; // it is an internet socket
-  ret->dest_addr.sin_port = htons(ret->port); // put our port, into network byte order
-  ret->dest_addr.sin_addr.s_addr = inet_addr(inet_ntoa(*((struct in_addr *)server_addr->h_addr))); // put in the ip we found...
-  memset(&(ret->dest_addr.sin_zero), '\0', 8); // clear the memory to NULL for the sin_zero crap... whatever
+  ret->destination.sin_family = AF_INET; // it is an internet socket
+  ret->destination.sin_port = htons(ret->port); // put our port, into network byte order
+  ret->destination.sin_addr.s_addr = inet_addr(inet_ntoa(*((struct in_addr *)server_addr->h_addr))); // put in the ip we found...
+  memset(&(ret->destination.sin_zero), '\0', 8); // clear the memory to NULL for the sin_zero crap... whatever
   
   ret->socket = socket(AF_INET, SOCK_STREAM, 0); // make the socket
   
   LOG("Trying to connect()...");
-  if(connect(ret->socket, (struct sockaddr *)&ret->dest_addr, sizeof(struct sockaddr)) == -1) // try and connect
+  if(connect(ret->socket, (struct sockaddr *)&ret->destination, sizeof(struct sockaddr)) == -1) // try and connect
   {
     LOG("Failed to connect(). More details follow:");
     switch(errno)
@@ -182,13 +182,13 @@ void bsock_disconnect(bsock *s)
   s->connected = 0;
 }
 
-void bsock_destroy_sock(bsock *s)
+void bsock_destroy(bsock *s)
 {
   if(s->connected)
     bsock_disconnect(s);
-  if(s->server != NULL)
-    bfree(s->server);
-  s->server = NULL;
+  if(s->hostname != NULL)
+    bfree(s->hostname);
+  s->hostname = NULL;
   s->port = 0;
   s->socket = 0;
   bfree(s);

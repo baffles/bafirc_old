@@ -8,8 +8,7 @@
  ** mem.c
  **/
 
-//#include "bafirc.h"
-#include "bafirc/mem.h"
+#include "bafirc.h"
 
 b__internal_memmap_list *b__internal_memmap = NULL;
 int b__internal_self_mem_usage = 0;

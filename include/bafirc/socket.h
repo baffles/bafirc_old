@@ -31,7 +31,7 @@ EXPORT int bsock_recv(bsock *s, char *buf, int len);
 
 EXPORT bsock *bsock_connect(char *host, int port, unsigned char non_blocking);
 EXPORT void bsock_disconnect(bsock *s);
-EXPORT void bsock_destroy_sock(bsock *s);
+EXPORT void bsock_destroy(bsock *s);
 
 EXPORT int bsock_init();
 EXPORT void bsock_deinit();

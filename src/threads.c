@@ -17,9 +17,9 @@
  *              start it with bafirc_thread_start
  * Return: pointer to the data for the thread
  */
-bthread *bhtread_create(thread_func tfunc, void *data)
+bthread *bthread_create(thread_func tfunc, void *data)
 {
-  bafirc_thread *ret;
+  bthread *ret;
   
   ret = (bthread *)balloc(sizeof(bthread));
   if(ret == NULL)
@@ -38,7 +38,7 @@ bthread *bhtread_create(thread_func tfunc, void *data)
  */
 void bthread_start(bthread *t)
 {
-  t->die = FALSE;
+  t->die = 0;
   pthread_create(&t->thread, NULL, t->tfunc, (void *)t);
   pthread_detach(t->thread);
 }

@@ -26,12 +26,12 @@ typedef struct b__internal_memmap_list
   struct b__internal_memmap_list *next;
 } b__internal_memmap_list;
 
-void *balloc(size_t size);
-void *bcalloc(size_t memsize, size_t size);
-void *brealloc(void *ptr, size_t size);
-void bfree(void *ptr);
+EXPORT void *balloc(size_t size);
+EXPORT void *bcalloc(size_t memsize, size_t size);
+EXPORT void *brealloc(void *ptr, size_t size);
+EXPORT void bfree(void *ptr);
 
-void print_mem_report(FILE *out);
-size_t mem_usage();
+EXPORT void print_mem_report(FILE *out);
+EXPORT size_t mem_usage();
 
 #endif
