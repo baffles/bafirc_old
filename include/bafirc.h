@@ -119,7 +119,7 @@ EXPORT FILE *bafirc_log_file;
   #define BAFIRC_CLOSE_LOG_FILE()
 #endif
 
-//#include "bafirc/typedefs.h" /* this lists all typedefs so circular define dependencies (irc.h requires callback.h, callback.h requires irc.h) arent a problem */
+#include "bafirc/typedefs.h"
 
 #include "bafirc/mem.h"
 #include "bafirc/threads.h"

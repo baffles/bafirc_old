@@ -1,4 +1,3 @@
-UNIX = 1 
-EXE = 
-IDIR = /usr/local/include
-LDIR = /usr/local/lib
+EXE = .exe
+IDIR = c:\mingw\include
+LDIR = c:\mingw\lib

@@ -15,15 +15,15 @@
 #include "bafirc.h"
 #endif
 
-typedef struct birc_server_info
+struct birc_server_info
 {
   char *server;
   int port;
   
   char motd[10240]; int motd_i;
-} birc_server_info;
+};
 
-typedef struct birc
+struct birc
 {
   birc_server_info *info;
   bthread *thread;
@@ -37,9 +37,9 @@ typedef struct birc
   char *password;
   char *realname;
   bcallback_list *callbacks;
-} birc;
+};
 
-typedef struct birc_message
+struct birc_message
 {
   int num_params;
   char *message;
@@ -48,7 +48,7 @@ typedef struct birc_message
   char *hostname;
   char *command;
   char **params;
-} birc_message;
+};
 
 EXPORT birc *birc_connect(char *server, int port, char *nick1, char *nick2, char *nick3, char *username, char *realname, char *password, unsigned char use_identd);
 EXPORT void birc_disconnect(birc *i, char *reason);

@@ -181,6 +181,37 @@ void print_mem_report(FILE *out)
   fprintf(out, "\nEnd of report\n");
 }
 
+void print_mem_report_irc(birc *irc, char *chan)
+{
+  b__internal_memmap_list *i;
+  bsock_send_fmt(irc->socket, "PRIVMSG %s :== balloc Memory Usage Report ==\r\n", chan);
+  Sleep(1000);
+  bsock_send_fmt(irc->socket, "PRIVMSG %s : Total Memory Usage: %d bytes\r\n", chan, mem_usage());
+  Sleep(1000);
+  bsock_send_fmt(irc->socket, "PRIVMSG %s :  Internal Memory Usage: %d bytes\r\n", chan, b__internal_self_mem_usage);
+  Sleep(1000);
+  bsock_send_fmt(irc->socket, "PRIVMSG %s :  Program Memory Usage:  %d bytes\r\n", chan, mem_usage() - b__internal_self_mem_usage);
+  Sleep(1000);
+  bsock_send_fmt(irc->socket, "PRIVMSG %s : \r\n", chan);
+  Sleep(1000);
+  bsock_send_fmt(irc->socket, "PRIVMSG %s :Allocation Table:\r\n", chan);
+  Sleep(1000);
+  if(b__internal_memmap != NULL)
+  {
+    //for(i = b__internal_memmap; i->next != NULL; i = i->next)
+    i = b__internal_memmap;
+    while(1)
+    {
+      bsock_send_fmt(irc->socket, "PRIVMSG %s : * Address: 0x%p\tSize: %10d bytes\t\t%s\r\n", (void *)i, i->size, (i->allocated ? "Is Allocated" : "Isn't Allocated"));
+      Sleep(1000);
+      if(i->next == NULL)
+        break;
+      i = i->next;
+    }
+  }
+  bsock_send_fmt(irc->socket, "PRIVMSG %s :End of report\r\n", chan);
+}
+
 size_t mem_usage()
 {
   if(!b__internal_memmap)

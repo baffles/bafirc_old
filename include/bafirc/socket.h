@@ -15,7 +15,7 @@
 #include "bafirc.h"
 #endif
 
-typedef struct bsock
+struct bsock
 {
   struct sockaddr_in destination;
   char *hostname;
@@ -23,7 +23,7 @@ typedef struct bsock
   int socket;
   unsigned char connected;
   unsigned char non_blocking;
-} bsock;
+};
 
 EXPORT int bsock_send(bsock *s, char *buf, int len);
 EXPORT int bsock_send_fmt(bsock *s, char *fmt, ...);

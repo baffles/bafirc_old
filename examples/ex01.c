@@ -39,6 +39,12 @@ int privmsg_proc(bcallback_info *inf)
       strncpy(bcomstuff, inf->message->params[i] + 6, strlen(inf->message->params[i]) - 6);
       bsock_send_fmt(inf->irc->socket, "%s\r\n", bcomstuff);
     }
+    //void print_mem_report_irc(struct birc *irc, char *chan)
+    if(strncasecmp("!mem", inf->message->params[i], 4) == 0)
+    {
+      printf("MEMORY REPORT!\n");
+      print_mem_report_irc(inf->irc, inf->message->params[0]);
+    }
   }
   return 0;
 }

@@ -15,20 +15,18 @@
 #include "bafirc.h"
 #endif
 
-typedef struct bcallback_info
+struct bcallback_info
 {
   struct birc_message *message;
   struct birc *irc;
-} bcallback_info;
+};
 
-typedef int (*bcallback_func)(bcallback_info *);
-
-typedef struct bcallback_list
+struct bcallback_list
 {
   bcallback_func function;
   char *trigger;
   struct bcallback_list *next;
-} bcallback_list;
+};
 
 extern bcallback_list *bcallback_global_list;
 

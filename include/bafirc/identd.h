@@ -15,12 +15,12 @@
 #include "bafirc.h"
 #endif
 
-typedef struct bidentd
+struct bidentd
 {
   bthread *thread;
   char *id, *os;
   struct birc *irc;
-} bidentd;
+};
 
 EXPORT bidentd *bidentd_create(char *id, char *os, struct birc *irc);
 EXPORT void bidentd_destroy(bidentd *i);

@@ -358,6 +358,7 @@ birc_message *birc_parse(char *msg)
       return NULL;
     }
     strncpy(ret->nickname, t1, t2 - t1);
+    ret->nickname[(t2 - t1)] = '\0';
     if(*t2 == '!') /* is there an id/username? */
     {
       t1 = ++t2;
@@ -372,6 +373,7 @@ birc_message *birc_parse(char *msg)
         return NULL;
       }
       strncpy(ret->username, t1, t2 - t1);
+      ret->username[(t2 - t1)] = '\0';
       if(*t2 == '@') /* is there a hostname? */
       {
         t1 = ++t2;
@@ -387,8 +389,22 @@ birc_message *birc_parse(char *msg)
           return NULL;
         }
         strncpy(ret->hostname, t1, t2 - t1);
+        ret->hostname[(t2 - t1)] = '\0';
       }
+      else
+        ret->hostname = NULL;
     }
+    else
+    {
+      ret->username = NULL;
+      ret->hostname = NULL;
+    }
+  }
+  else
+  {
+    ret->nickname = NULL;
+    ret->username = NULL;
+    ret->hostname = NULL;
   }
   
   while(*t2 && isspace(*t2))
