@@ -19,7 +19,7 @@ struct bidentd
 {
   bthread *thread;
   char *id, *os;
-  struct birc *irc;
+  birc *irc;
 };
 
 EXPORT bidentd *bidentd_create(char *id, char *os, struct birc *irc);

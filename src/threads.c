@@ -10,13 +10,6 @@
 
 #include "bafirc.h"
 
-/* Function: bafirc_create_thread
- * Arguments: tfunc - thread function
- *            data  - data to be passed to the thread upon start
- * Description: Makes a thread data structure, preparing it so you can
- *              start it with bafirc_thread_start
- * Return: pointer to the data for the thread
- */
 bthread *bthread_create(thread_func tfunc, void *data)
 {
   bthread *ret;
@@ -31,35 +24,27 @@ bthread *bthread_create(thread_func tfunc, void *data)
   return ret;
 }
 
-/* Function: bafirc_thread_start
- * Arguments: t - the thread to start
- * Description: starts thread `t`
- * Return: nothin'
- */
 void bthread_start(bthread *t)
 {
   t->die = 0;
+//#ifdef ON_WINDOWS
+//  t->thread = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)t->tfunc, (LPVOID)t->data, 0, &t->thread_id);
+//#else
   pthread_create(&t->thread, NULL, t->tfunc, (void *)t);
   pthread_detach(t->thread);
+//#endif
 }
 
-/* Function: bafirc_thread_stop
- * Arguments: t - the thread to stop 
- * Description: stops thread `t`
- * Return: nothin'
- */
 void bhtread_stop(bthread *t)
 {
   t->die = TRUE;
 }
 
-/* Function: bafirc_destroy_thread
- * Arguments: t - the thread to free from memory
- * Description: frees `t` from memory
- * Return: nothin'
- */
 void bthread_destroy(bthread *t)
 {
+/*#ifdef ON_WINDOWS
+  CloseHandle(t->thread);
+#endif*/
   bfree(t->data);
   bfree(t);
   t = NULL;

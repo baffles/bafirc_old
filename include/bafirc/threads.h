@@ -15,14 +15,15 @@
 #include "bafirc.h"
 #endif
 
-//typedef void (*thread_func)(void *, bafirc_thread *);// thread_func;
-typedef void * (*thread_func)(void *);
-
 struct bthread
 {
+/*#ifdef ON_WINDOWS
+  HANDLE thread;
+  DWORD thread_id;
+#else*/
   pthread_t thread;
+//#endif
   thread_func tfunc;
-  //void *(*tfunc) (void *);
   void *data;
   BOOL die;
 };

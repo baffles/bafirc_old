@@ -36,5 +36,6 @@ typedef struct bsock bsock;
 
 /* threads.h */
 typedef struct bthread bthread;
+typedef void * (*thread_func)(void *);
 
 #endif /* BAFIRC_TYPEDEFS_H */

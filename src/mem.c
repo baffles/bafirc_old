@@ -118,12 +118,15 @@ void bfree(void *ptr)
   
   while(1)
   {
+    printf("bfree: checking %p\n", ptr);
+    if(node == NULL)
+      break;
     if(node->ptr_address == ptr)
     {
       working = node;
       break;
     }
-    else if(node->next == NULL)
+    if(node->next == NULL)
       break;
     prev = node;
     node = node->next;
@@ -132,6 +135,8 @@ void bfree(void *ptr)
   if(working == NULL) /* this wasn't found in the list, so just give up :P */
     return;
   node = working;
+  
+  printf("bfree: freeing %p\n", ptr);
   
   /* otherwise delete and free it */
   free(node->ptr_address);
@@ -202,8 +207,8 @@ void print_mem_report_irc(birc *irc, char *chan)
     i = b__internal_memmap;
     while(1)
     {
-      bsock_send_fmt(irc->socket, "PRIVMSG %s : * Address: 0x%p\tSize: %10d bytes\t\t%s\r\n", (void *)i, i->size, (i->allocated ? "Is Allocated" : "Isn't Allocated"));
-      Sleep(1000);
+      bsock_send_fmt(irc->socket, "PRIVMSG %s : * Address: 0x%p\tSize: %10d bytes\t\t%s\r\n", chan, (void *)i, i->size, (i->allocated ? "Is Allocated" : "Isn't Allocated"));
+      Sleep(2000);
       if(i->next == NULL)
         break;
       i = i->next;

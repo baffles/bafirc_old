@@ -14,7 +14,7 @@ endif
 LIBNAME = bafirc
 
 CFLAGS = -I./include
-LDFLAGS = -L./lib 
+LDFLAGS = -L./lib
 
 ECFLAGS = -I./include
 ELDFLAGS = -L./lib

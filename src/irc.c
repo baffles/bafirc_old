@@ -231,7 +231,7 @@ void *birc_thread(void *data)
 #endif
   bthread *self = (bthread *)data;
   birc *irc = (birc *)self->data;
-  birc_message *msg;
+  birc_message *msg; int i;
   offset = index = index2 = 0;
   while(!self->die)
   {
@@ -277,46 +277,59 @@ void *birc_thread(void *data)
       index = strlen(buf);
       
       //LOG("Got a message: ");
-      LOG(tmp);
+      LOG(tmp); printf("\t%s", tmp);
       
       msg = birc_parse(tmp);
       
-      /* some hard coded proc's */
-      if(strncasecmp(msg->command, "PING", 4) == 0)
+      if(msg)
       {
-        printf("PING!\n");
-        bsock_send_fmt(irc->socket, "PONG :%s\r\n", msg->params[0]);
-      }/*
-      if(strncasecmp(msg->command, "ERROR", 5) == 0)
-      {
-        LOG("Recieved error from server, disconnected from irc. More info follows:");
-        LOG(msg->params[0]);
-        irc->socket->connected = FALSE;
-        self->die = TRUE;
-      }
-      /* MOTD procs *//*
-      if(strncasecmp(msg->command, "375", 3) == 0)
-      {
-        LOG("MOTD starting...");
-        irc->info->motd_i = 0;
-      }
-      if(strncasecmp(msg->command, "372", 3) == 0)
-      {
-        int local_i;
-        LOG(msg->params[0]);
-        while(irc->info->motd_i < 10240 && local_i < strlen(msg->params[0]))
+        /* some hard coded proc's */
+        if(strncasecmp(msg->command, "PING", 4) == 0)
         {
-          irc->info->motd[irc->info->motd_i] = msg->params[0][local_i];
-          ++local_i; ++irc->info->motd_i;
+          printf("PING!\n");
+          bsock_send_fmt(irc->socket, "PONG :%s\r\n", msg->params[0]);
+        }/*
+        if(strncasecmp(msg->command, "ERROR", 5) == 0)
+        {
+          LOG("Recieved error from server, disconnected from irc. More info follows:");
+          LOG(msg->params[0]);
+          irc->socket->connected = FALSE;
+          self->die = TRUE;
         }
+        /* MOTD procs *//*
+        if(strncasecmp(msg->command, "375", 3) == 0)
+        {
+          LOG("MOTD starting...");
+          irc->info->motd_i = 0;
+        }
+        if(strncasecmp(msg->command, "372", 3) == 0)
+        {
+          int local_i;
+          LOG(msg->params[0]);
+          while(irc->info->motd_i < 10240 && local_i < strlen(msg->params[0]))
+          {
+            irc->info->motd[irc->info->motd_i] = msg->params[0][local_i];
+            ++local_i; ++irc->info->motd_i;
+          }
+        }
+        if(strncasecmp(msg->command, "376", 3) == 0)
+        {
+          LOG("MOTD done.");
+        }*/
+        
+        if(bcallback_handle(msg, irc) != 0)
+          self->die = 1;
+        
+          printf("Parsed message %s\tResults:\n", msg->message);
+          printf("Nickname:\t%s\n", msg->nickname);
+          printf("Username:\t%s\n", msg->username);
+          printf("Hostname:\t%s\n", msg->hostname);
+          printf("Command:\t%s\n", msg->command);
+          printf("Params (%d)\n", msg->num_params);
+          for(i = 0; i < msg->num_params; ++i)
+            printf("\t%d\t%s\n", i, msg->params[i]);
+        birc_destroy_message(msg);
       }
-      if(strncasecmp(msg->command, "376", 3) == 0)
-      {
-        LOG("MOTD done.");
-      }*/
-      
-      bcallback_handle(msg, irc);
-      birc_destroy_message(msg);
     }
     
     //YIELD();
@@ -331,7 +344,7 @@ birc_message *birc_parse(char *msg)
   unsigned int i;
   const char *t1 = msg;
   const char *t2 = msg;
-  char t3[255];
+  char *t3;
   
   ret = (birc_message *)balloc(sizeof(birc_message));
   if(!ret)
@@ -440,11 +453,14 @@ birc_message *birc_parse(char *msg)
       ++t1;
       while(*t2)
         ++t2;
+      t3 = (char *)balloc((t2 - t1) + 1);
+      // add check + dealloc + fail for NULL
       strncpy(t3, t1, t2 - t1);
       t3[t2 - t1] = '\0';
       if(birc__add_param(ret, t3) != 0)
       {
         int j;
+        bfree(t3);
         for(j = 0; j < ret->num_params; ++j)
           bfree(ret->params[j]);
         bfree(ret->params);
@@ -456,12 +472,14 @@ birc_message *birc_parse(char *msg)
         bfree(ret);
         return NULL;
       }
+      bfree(t3);
       break;
     }
     else
     {
       while(*t2 && !isspace(*t2))
         ++t2;
+      t3 = (char *)balloc((t2 - t1) + 1);
       strncpy(t3, t1, t2 - t1);
       t3[t2 - t1] = '\0';
       if(birc__add_param(ret, t3) != 0)

@@ -170,6 +170,7 @@ int bcallback_uninstall(birc *irc, bcallback_func func)
 int bcallback_handle(birc_message *m, birc *irc)
 {
   /* call all global + local callbacks for the message's command (ie, trigger) */
+  int rstat = 0;
   bcallback_list *node = bcallback_global_list;
   bcallback_info *info = (bcallback_info *)balloc(sizeof(bcallback_info));
   info->message = m; info->irc = irc;
@@ -178,7 +179,8 @@ int bcallback_handle(birc_message *m, birc *irc)
     while(1)
     {
       if(strcasecmp(m->command, node->trigger) == 0)
-        (*node->function)(info);
+        if((rstat = (*node->function)(info)) != 0)
+          break;
       if(!node->next)
         break;
       node = node->next;
@@ -186,18 +188,20 @@ int bcallback_handle(birc_message *m, birc *irc)
   }
   
   node = irc->callbacks;
-  if(node)
+  if(node && rstat == 0)
   {
     while(1)
     {
       if(strcasecmp(m->command, node->trigger) == 0)
-        (*node->function)(info);
+        if((rstat = (*node->function)(info)) != 0)
+          break;
       if(!node->next)
         break;
       node = node->next;
     }
   }
-  return 0;
+  bfree(info);
+  return rstat;
 }
 
 
