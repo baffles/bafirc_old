@@ -118,7 +118,7 @@ void bfree(void *ptr)
   
   while(1)
   {
-    printf("bfree: checking %p\n", ptr);
+    //printf("bfree: checking %p\n", ptr);
     if(node == NULL)
       break;
     if(node->ptr_address == ptr)
@@ -136,7 +136,7 @@ void bfree(void *ptr)
     return;
   node = working;
   
-  printf("bfree: freeing %p\n", ptr);
+  //printf("bfree: freeing %p\n", ptr);
   
   /* otherwise delete and free it */
   free(node->ptr_address);
@@ -190,17 +190,17 @@ void print_mem_report_irc(birc *irc, char *chan)
 {
   b__internal_memmap_list *i;
   bsock_send_fmt(irc->socket, "PRIVMSG %s :== balloc Memory Usage Report ==\r\n", chan);
-  Sleep(1000);
+  //Sleep(1000);
   bsock_send_fmt(irc->socket, "PRIVMSG %s : Total Memory Usage: %d bytes\r\n", chan, mem_usage());
-  Sleep(1000);
+  //Sleep(1000);
   bsock_send_fmt(irc->socket, "PRIVMSG %s :  Internal Memory Usage: %d bytes\r\n", chan, b__internal_self_mem_usage);
-  Sleep(1000);
+  //Sleep(1000);
   bsock_send_fmt(irc->socket, "PRIVMSG %s :  Program Memory Usage:  %d bytes\r\n", chan, mem_usage() - b__internal_self_mem_usage);
-  Sleep(1000);
+  //Sleep(1000);
   bsock_send_fmt(irc->socket, "PRIVMSG %s : \r\n", chan);
-  Sleep(1000);
+  //Sleep(1000);
   bsock_send_fmt(irc->socket, "PRIVMSG %s :Allocation Table:\r\n", chan);
-  Sleep(1000);
+  //Sleep(1000);
   if(b__internal_memmap != NULL)
   {
     //for(i = b__internal_memmap; i->next != NULL; i = i->next)
@@ -208,7 +208,7 @@ void print_mem_report_irc(birc *irc, char *chan)
     while(1)
     {
       bsock_send_fmt(irc->socket, "PRIVMSG %s : * Address: 0x%p\tSize: %10d bytes\t\t%s\r\n", chan, (void *)i, i->size, (i->allocated ? "Is Allocated" : "Isn't Allocated"));
-      Sleep(2000);
+      //Sleep(2000);
       if(i->next == NULL)
         break;
       i = i->next;
