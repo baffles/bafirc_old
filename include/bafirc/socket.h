@@ -12,12 +12,28 @@
 #define BAFIRC_SOCKET_H
 
 #ifndef BAFIRC_H
-  #include "bafirc.h"
+#include "bafirc.h"
 #endif
 
-#include <string.h>
-#include <stdio.h>
+typedef struct bsock
+{
+  struct sockaddr_in destination;
+  char *hostname;
+  int port;
+  int socket;
+  unsigned char connected;
+  unsigned char non_blocking;
+} bsock;
 
+EXPORT int bsock_send(bsock *s, char *buf, int len);
+EXPORT int bsock_send_fmt(bsock *s, char *fmt, ...);
+EXPORT int bsock_recv(bsock *s, char *buf, int len);
 
+EXPORT bsock *bsock_connect(char *host, int port, unsigned char non_blocking);
+EXPORT void bsock_disconnect(bsock *s);
+EXPORT void bsock_destroy_sock(bsock *s);
+
+EXPORT int bsock_init();
+EXPORT void bsock_deinit();
 
 #endif

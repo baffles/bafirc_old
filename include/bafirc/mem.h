@@ -12,7 +12,7 @@
 #define BAFIRC_MEM_H
 
 #ifndef BAFIRC_H
-  //#include "bafirc.h"
+//#include "bafirc.h"
 #endif
 
 #include <string.h>
@@ -20,10 +20,10 @@
 
 typedef struct b__internal_memmap_list
 {
- void *ptr_address;
- size_t size;
- unsigned char allocated;
- struct b__internal_memmap_list *next;
+  void *ptr_address;
+  size_t size;
+  unsigned char allocated;
+  struct b__internal_memmap_list *next;
 } b__internal_memmap_list;
 
 void *balloc(size_t size);

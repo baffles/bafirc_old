@@ -11,11 +11,26 @@
 //#include "bafirc.h"
 #include "bafirc/mem.h"
 
-#define MALLOC_INTERNAL(s) malloc(s); b__internal_self_mem_usage += s;
-#define FREE_INTERNAL(ptr) free(ptr); b__internal_self_mem_usage -= sizeof(*(ptr));
-
 b__internal_memmap_list *b__internal_memmap = NULL;
 int b__internal_self_mem_usage = 0;
+
+/* internal functions */
+b__internal_memmap_list *balloc_node()
+{
+  void *ret = NULL;
+  ret = (b__internal_memmap_list *)malloc(sizeof(b__internal_memmap_list));
+  if(!ret)
+    return NULL;
+  b__internal_self_mem_usage += sizeof(b__internal_memmap_list);
+  return ret;
+}
+void bfree_node(void *ptr)
+{
+  if(!ptr)
+    return;
+  free(ptr);
+  b__internal_self_mem_usage -= sizeof(b__internal_memmap_list);
+}
 
 void *balloc(size_t size)
 {
@@ -24,7 +39,7 @@ void *balloc(size_t size)
   if(!node)
   {
     /* we gotta allocate the list \o/ */
-    b__internal_memmap = (b__internal_memmap_list *)MALLOC_INTERNAL(sizeof(b__internal_memmap_list));
+    b__internal_memmap = balloc_node();
     if(!b__internal_memmap)
       return NULL;
     node = b__internal_memmap;
@@ -33,7 +48,7 @@ void *balloc(size_t size)
   {
     while(node->next)
       node = node->next;
-    node->next = (b__internal_memmap_list *)MALLOC_INTERNAL(sizeof(b__internal_memmap_list));
+    node->next = balloc_node();
     if(!node->next)
       return NULL;
     node = node->next;
@@ -122,13 +137,18 @@ void bfree(void *ptr)
   tmp = node->next;
   if(node->next == NULL)
   {
-    FREE_INTERNAL(node);
+    bfree_node(node);
     b__internal_memmap = NULL;
+  }
+  else if(node == prev)
+  {
+    bfree_node(node);
+    b__internal_memmap = tmp;
   }
   else
   {
     node->next = NULL;
-    FREE_INTERNAL(prev->next);
+    bfree_node(prev->next);
     prev->next = tmp;
   }
 }
