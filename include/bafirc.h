@@ -95,6 +95,10 @@ EXPORT char bafirc_error[MAX_ERROR_LENGTH];
 #include <stdarg.h>
 #include <pthread.h>
 
+#ifdef FORTIFY
+  #include "fortify.h"
+#endif
+
 #define DEFAULT_NAMES "BAFIRC"
 #define UNUSED(x) (void) x
 #ifdef ON_WINDOWS
@@ -104,11 +108,11 @@ EXPORT char bafirc_error[MAX_ERROR_LENGTH];
 EXPORT FILE *bafirc_log_file;
 
 #if defined(BAFIRC_DEBUG) || defined(BAFIRC_USELOG)
-  #define LOG(v)    fprintf(bafirc_log_file, "%s: %s\n", __FUNCTION__, v)
+  #define LOG(v)    if(bafirc_log_file) fprintf(bafirc_log_file, "%s: %s\n", __FUNCTION__, v)
 #endif
 
 #if defined(BAFIRC_DEBUG) || defined(BAFIRC_USELOG)
-  #define BAFIRC_LOAD_LOG_FILE() bafirc_log_file = fopen("./bafirc.log", "w+");
+  #define BAFIRC_LOAD_LOG_FILE() bafirc_log_file = fopen("./bafirc.log", "w");
 #else
   #define BAFIRC_LOAD_LOG_FILE()
 #endif
@@ -121,7 +125,7 @@ EXPORT FILE *bafirc_log_file;
 
 #include "bafirc/typedefs.h"
 
-#include "bafirc/mem.h"
+//#include "bafirc/mem.h"
 #include "bafirc/threads.h"
 
 #include "bafirc/socket.h"

@@ -22,23 +22,27 @@ ELDFLAGS = -L./lib
 # Check debug options
 ifdef DEBUGMODE
 LIBNAME := bircd
-CFLAGS += -MMD -g3 -W -Wall -mcpu=$(ARCH_TYPE) -DBAFIRC_DEBUG
+CFLAGS += -MMD -g3 -W -Wall -march=$(ARCH_TYPE) -DBAFIRC_DEBUG -DFORTIFY -I./fortify
 LDFLAGS += -g3
 
-ECFLAGS += -MMD -g3 -W -Wall -mcpu=$(ARCH_TYPE) -DBAFIRC_DEBUG
-ELDFLAGS += -g3
+ECFLAGS += -MMD -g3 -W -Wall -march=$(ARCH_TYPE) -DBAFIRC_DEBUG -DFORTIFY -I./fortify
+ELDFLAGS += -g3 $(FORTIFY)
+
+FORTIFY = fortify/fortify.o
 else
 CFLAGS += -MMD -O3 -march=$(ARCH_TYPE) -W -Wall -fomit-frame-pointer -ffast-math -funroll-loops
 LDFLAGS += -O3
 
 ECFLAGS += -MMD -O3 -march=$(ARCH_TYPE) -W -Wall -fomit-frame-pointer -ffast-math -funroll-loops
 ELDFLAGS += -O3
+fortify = 
 endif
 
 # Extra stuff
 ARCH = lib$(LIBNAME).a
 ifndef UNIX
-LDFLAGS += -lwsock32 -lpthreadgc
+CFLAGS += -Iwin32/pthreads/include
+LDFLAGS += -Lwin32/pthreads/lib -lwsock32 -lpthreadgc1
 SHARED = $(LIBNAME).dll
 else
 LDFLAGS += -lpthread
@@ -59,14 +63,14 @@ CC = gcc
 
 # Build a list of source and object files
 SRCS = $(wildcard src/*.c)
-OBJS = $(subst src/,obj/,$(subst .c,.o,$(SRCS)))
+OBJS = $(subst src/,obj/,$(subst .c,.o,$(SRCS))) $(FORTIFY)
 
 EXS = $(wildcard examples/*.c)
-EXO = $(subst examples/,examples/obj/,$(subst .c,.o,$(EXS)))
+EXO = $(subst examples/,examples/obj/,$(subst .c,.o,$(EXS))) $F
 EX =  $(subst .c,$(EXE),$(EXS))
 
 # Default target: make dependancies then the lib
-all: $(TARGET) $(EX)
+all: $(TARGET) $(EX) $(FORTIFY)
 	@echo You are now ready for `make install`! Remeber, on linux will have to su to root
 	@echo to install it.
 
@@ -176,4 +180,6 @@ else
 	rm -rf $(LDIR)/$(ARCH)
 endif
 	@echo All uninstalled :/
-
+	
+fortify/fortify.o: fortify/fortify.c
+	gcc -Wall -DFORTIFY -Wformat -x c -c fortify/fortify.c -o fortify/fortify.o

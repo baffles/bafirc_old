@@ -9,6 +9,12 @@
  **/
 
 #include "bafirc.h"
+#define balloc malloc
+#define bfree free
+#define brealloc realloc
+#define bcalloc calloc
+#define print_mem_report(a)
+#define print_mem_report_irc(a, b)
 
 birc *birc_connect(char *server, int port, char *nick1, char *nick2, char *nick3, char *username,
   char *realname, char *password, unsigned char use_identd)
@@ -35,7 +41,7 @@ birc *birc_connect(char *server, int port, char *nick1, char *nick2, char *nick3
   
   /* make the server info */
   ret->info = (birc_server_info *)balloc(sizeof(birc_server_info));
-  ret->info->server = (char *)balloc(strlen(server));
+  ret->info->server = (char *)balloc(strlen(server) + 1);
   strcpy(ret->info->server, server);
   ret->info->port = port;
   ret->info->motd_i = 0;
@@ -193,7 +199,7 @@ void birc_disconnect(birc *i, char *reason)
 {
   if(i->socket->connected)
   {
-    bsock_send_fmt(i->socket, "QUIT :%s\r\n", (reason ? reason : "Leaving..."));
+    //bsock_send_fmt(i->socket, "QUIT :%s\r\n", (reason ? reason : "Leaving..."));
     bsock_disconnect(i->socket);
   }
 }
@@ -260,7 +266,7 @@ void *birc_thread(void *data)
       
       index = strlen(buf);
       
-      cur = buf;
+      /*cur = buf;
       len = 0;
       while(cur && !strchr("\r\n", *cur))
       {
@@ -274,7 +280,16 @@ void *birc_thread(void *data)
       tmp[cur - buf] = '\0';
       memmove(buf, buf + (cur - buf), 1024 - (cur - buf));
       memset(buf + (cur - buf), '\0', 1024 - (cur - buf));
+      index = strlen(buf);*/
+      //memmove(buf, buf + (cur - buf), 1024 - (cur - buf));
+      //memset(buf + (cur - buf), '\0', 1024 - (cur - buf));
+      //index = cur - buf;
+      len = strlen(tmp);
+      memmove(buf, buf + len, 1024 - len);
+      memset(buf + len, '\0', 1024 - len);
       index = strlen(buf);
+      printf("Length = %d  index = %d\n", len, index);
+      //index = strlen(buf);
       
       //LOG("Got a message: ");
       LOG(tmp); printf("\t%s", tmp);
@@ -318,16 +333,21 @@ void *birc_thread(void *data)
         }*/
         
         if(bcallback_handle(msg, irc) != 0)
+        {
           self->die = 1;
+          // HACK
+          exit(1);
+          break;
+        }printf("Command:\t%s\n", msg->command);
         
-          printf("Parsed message %s\tResults:\n", msg->message);
+      /*    printf("Parsed message %s\tResults:\n", msg->message);
           printf("Nickname:\t%s\n", msg->nickname);
           printf("Username:\t%s\n", msg->username);
           printf("Hostname:\t%s\n", msg->hostname);
           printf("Command:\t%s\n", msg->command);
           printf("Params (%d)\n", msg->num_params);
           for(i = 0; i < msg->num_params; ++i)
-            printf("\t%d\t%s\n", i, msg->params[i]);
+            printf("\t%d\t%s\n", i, msg->params[i]);*/
         birc_destroy_message(msg);
       }
     }
@@ -350,7 +370,7 @@ birc_message *birc_parse(char *msg)
   if(!ret)
     return NULL;
   ret->num_params = 0;
-  ret->message = (char *)balloc(strlen(msg));
+  ret->message = (char *)balloc(strlen(msg) + 1);
   if(!ret->message)
   {
     bfree(ret);
@@ -506,7 +526,7 @@ birc_message *birc_parse(char *msg)
 
 int birc__add_param(birc_message *m, const char *param)
 {
-  char **tmp = brealloc((void *)m->params, sizeof(char*) * m->num_params + 1);
+  char **tmp = (char **)brealloc((void *)m->params, sizeof(char*) * m->num_params + 1);
   if(!tmp)
     return -1;
   m->num_params++;
@@ -517,7 +537,7 @@ int birc__add_param(birc_message *m, const char *param)
     m->num_params--;
     return -1;
   }
-  strcpy(m->params[m->num_params -1], param);
+  strcpy(m->params[m->num_params - 1], param);
   return 0;
 }
 

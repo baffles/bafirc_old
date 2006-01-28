@@ -9,6 +9,12 @@
  **/
 
 #include "bafirc.h"
+#define balloc malloc
+#define bfree free
+#define brealloc realloc
+#define bcalloc calloc
+#define print_mem_report(a)
+#define print_mem_report_irc(a, b)
 
 bthread *bthread_create(thread_func tfunc, void *data)
 {

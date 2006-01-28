@@ -10,6 +10,12 @@
 
 //#include "bafirc.h"
 #include "bafirc/socket.h"
+#define balloc malloc
+#define bfree free
+#define brealloc realloc
+#define bcalloc calloc
+#define print_mem_report(a)
+#define print_mem_report_irc(a, b)
 
 int bsock_send(bsock *s, char *buf, int len)
 {

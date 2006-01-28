@@ -1,5 +1,12 @@
 #include "bafirc.h"
 
+#define balloc malloc
+#define bfree free
+#define brealloc realloc
+#define bcalloc calloc
+#define print_mem_report(a)
+#define print_mem_report_irc(a, b)
+
 int privmsg_proc(bcallback_info *inf)
 {
   int i;
@@ -19,7 +26,8 @@ int privmsg_proc(bcallback_info *inf)
     {
       printf("Dying\n");
       bsock_send_fmt(inf->irc->socket, "PRIVMSG #iia :Dying cause %s said !die.\r\n", inf->message->nickname);
-      bsock_send_fmt(inf->irc->socket, "QUIT :I'll be back</accent>\r\n");
+      birc_disconnect(inf->irc, "cause");
+      //bsock_send_fmt(inf->irc->socket, "QUIT :I'll be back</accent>\r\n");
       //Sleep(1000);
       return -1;
     }
@@ -62,8 +70,9 @@ int main(int argc, char *argv[])
     printf("ERROR! %s\n", bafirc_error);
   }
   bcallback_global_install(privmsg_proc, "PRIVMSG");
+  BAFIRC_LOAD_LOG_FILE();
   print_mem_report(stdout);
-  irc = birc_connect("irc.us.freenode.net", 6667, "bafirc", "bafirc", "bafirc", "bafirc", "bafirc", NULL, TRUE);
+  irc = birc_connect("zelazny.freenode.net", 6667, "bafirc", "bafirc", "bafirc", "bafirc", "bafirc", NULL, TRUE);
   if(irc == NULL || !irc->socket->connected)
   {
     birc_destroy(irc);
@@ -76,7 +85,7 @@ int main(int argc, char *argv[])
   while(!irc->thread->die);
   //while(1);
   printf("bye");
-  birc_disconnect(irc, "Ill be back!");
+  //birc_disconnect(irc, "Ill be back!");
   birc_destroy(irc);
   print_mem_report(stdout);
   return 0;
